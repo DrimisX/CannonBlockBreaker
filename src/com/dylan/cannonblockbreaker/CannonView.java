@@ -94,8 +94,38 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	public CannonView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		// TODO Auto-generated constructor stub
-	}
+		super(context, attrs); //call superclass constructor
+		activity = (Activity) context; // store reference to MainActivity
+		
+		// register SurfaceHolder.Callback listener
+		getHolder().addCallback(this);
+		
+		// initialize Lines and Point representing game items
+		blocker = new Line(); // create the blocker as a Line
+		target = new Line(); // create the target as a Line
+		cannonball = new Point(); // create the cannonball as a Point
+		
+		// initialize hitStates as a boolean array
+		hitStates = new boolean[TARGET_PIECES];
+		
+		// initialize SoundPool to play the app's three sound effects
+		soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+		
+		// create Map of sounds and pre-load sounds
+		soundMap = new SparseIntArray(3); // create new SparseIntArray
+		soundMap.put(TARGET_SOUND_ID, soundPool.load(context, R.raw.target_hit, 1));
+		soundMap.put(CANNON_SOUND_ID, soundPool.load(context,  R.raw.cannon_fire, 1));
+		soundMap.put(BLOCKER_SOUND_ID, soundPool.load(context, R.raw.blocker_hit, 1));
+		
+		// construct Paints for drawing text, cannonball, cannon, 
+		// blocker and target;  these are configured in method onSizeChanged
+		textPaint = new Paint();
+		cannonPaint = new Paint();
+		cannonballPaint = new Paint();
+		blockerPaint = new Paint();
+		targetPaint = new Paint();
+		backgroundPaint = new Paint();
+		
+	}// end CannonView constructor
 
 }
