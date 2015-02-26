@@ -278,5 +278,54 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 			showGameOverDialog(R.string.lose); // show the losing dialog
 		} 
 	} // end method updatePositions
+	
+	// fires a cannonball
+	public void fireCannonball(MotionEvent event) {
+		if (cannonballOnScreen) // if a cannonball is already on the screen
+			return; // do nothing
 
+		double angle = alignCannon(event); // get the cannon barrel's angle
+
+		// move the cannonball to be inside the cannon
+		cannonball.x = cannonballRadius; // align x-coordinate with cannon
+		cannonball.y = screenHeight / 2; // centers ball vertically
+
+		// get the x component of the total velocity
+		cannonballVelocityX = (int) (cannonballSpeed * Math.sin(angle));
+
+		// get the y component of the total velocity
+		cannonballVelocityY = (int) (-cannonballSpeed * Math.cos(angle));
+		cannonballOnScreen = true; // the cannonball is on the screen
+		++shotsFired; // increment shotsFired
+
+		// play cannon fired sound
+		soundPool.play(soundMap.get(CANNON_SOUND_ID), 1, 1, 1, 0, 1f);
+	} // end method fireCannonball
+	
+	// aligns the cannon in response to a user touch
+	public double alignCannon(MotionEvent event) {
+		// get the location of the touch in this view
+		Point touchPoint = new Point((int) event.getX(), (int) event.getY());
+
+		// compute the touch's distance from center of the screen
+		// on the y-axis
+		double centerMinusY = (screenHeight / 2 - touchPoint.y);
+
+		double angle = 0; // initialize angle to 0
+
+		// calculate the angle the barrel makes with the horizontal
+		if (centerMinusY != 0) // prevent division by 0
+			angle = Math.atan((double) touchPoint.x / centerMinusY);
+
+		// if the touch is on the lower half of the screen
+		if (touchPoint.y > screenHeight / 2)
+			angle += Math.PI; // adjust the angle
+
+		// calculate the endpoint of the cannon barrel
+		barrelEnd.x = (int) (cannonLength * Math.sin(angle));
+		barrelEnd.y = (int) (-cannonLength * Math.cos(angle) + screenHeight / 2);
+
+		return angle; // return the computed angle
+	} // end method alignCannon	
+	
 }
