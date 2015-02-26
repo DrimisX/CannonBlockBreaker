@@ -328,4 +328,49 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 		return angle; // return the computed angle
 	} // end method alignCannon	
 	
+	// draws the game to the given Canvas
+	public void drawGameElements(Canvas canvas) {
+		// clear the background
+		canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backgroundPaint);
+	      
+		// display time remaining
+		canvas.drawText(getResources().getString(R.string.time_remaining_format, timeLeft), 30, 50, textPaint);
+
+		// if a cannonball is currently on the screen, draw it
+		if (cannonballOnScreen)
+			canvas.drawCircle(cannonball.x, cannonball.y, cannonballRadius, cannonballPaint);
+
+		// draw the cannon barrel
+		canvas.drawLine(0, screenHeight / 2, barrelEnd.x, barrelEnd.y, cannonPaint);
+
+		// draw the cannon base
+		canvas.drawCircle(0, (int) screenHeight / 2, (int) cannonBaseRadius, cannonPaint);
+
+		// draw the blocker
+		canvas.drawLine(blocker.start.x, blocker.start.y, blocker.end.x, blocker.end.y, blockerPaint);
+
+		Point currentPoint = new Point(); // start of current target section
+
+		// initialize currentPoint to the starting point of the target
+		currentPoint.x = target.start.x;
+		currentPoint.y = target.start.y;
+
+		// draw the target
+		for (int i = 0; i < TARGET_PIECES; i++) {
+         // if this target piece is not hit, draw it
+			if (!hitStates[i]) {
+				// alternate coloring the pieces 
+				if (i % 2 != 0)
+					targetPaint.setColor(Color.BLUE);
+				else
+					targetPaint.setColor(Color.YELLOW);
+	            
+            canvas.drawLine(currentPoint.x, currentPoint.y, target.end.x,(int) (currentPoint.y + pieceLength), targetPaint);
+			} 
+	         
+			// move currentPoint to the start of the next piece
+			currentPoint.y += pieceLength;
+		} 
+	} // end method drawGameElements
+	
 }
