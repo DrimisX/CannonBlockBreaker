@@ -130,5 +130,48 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	// called by surfaceChanged when the size of the SurfaceView changes,
 	// such as when it's first added to the View hierarchy
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+	    super.onSizeChanged(w, h, oldw, oldh);
 
+	    screenWidth = w; // store CannonView's width
+	    screenHeight = h; // store CannonView's height
+	    cannonBaseRadius = h / 18; // cannon base radius 1/18 screen height
+	    cannonLength = w / 8; // cannon length 1/8 screen width
+
+	    cannonballRadius = w / 36; // cannonball radius 1/36 screen width
+	    cannonballSpeed = w * 3 / 2; // cannonball speed multiplier
+
+	    lineWidth = w / 24; // target and blocker 1/24 screen width
+
+	    // configure instance variables related to the blocker
+	    blockerDistance = w * 5 / 8; // blocker 5/8 screen width from left
+	    blockerBeginning = h / 8; // distance from top 1/8 screen height
+	    blockerEnd = h * 3 / 8; // distance from top 3/8 screen height
+	    initialBlockerVelocity = h / 2; // initial blocker speed multiplier
+	    blocker.start = new Point(blockerDistance, blockerBeginning);
+	    blocker.end = new Point(blockerDistance, blockerEnd);
+
+	    // configure instance variables related to the target
+	    targetDistance = w * 7 / 8; // target 7/8 screen width from left
+	    targetBeginning = h / 8; // distance from top 1/8 screen height
+	    targetEnd = h * 7 / 8; // distance from top 7/8 screen height
+	    pieceLength = (targetEnd - targetBeginning) / TARGET_PIECES;
+	    initialTargetVelocity = -h / 4; // initial target speed multiplier
+	    target.start = new Point(targetDistance, targetBeginning);
+	    target.end = new Point(targetDistance, targetEnd);
+
+	    // endpoint of the cannon's barrel initially points horizontally
+	    barrelEnd = new Point(cannonLength, h / 2);
+
+		// configure Paint objects for drawing game elements
+		textPaint.setTextSize(w / 20); // text size 1/20 of screen width
+	    textPaint.setAntiAlias(true); // smoothes the text
+		cannonPaint.setStrokeWidth(lineWidth * 1.5f); // set line thickness
+		blockerPaint.setStrokeWidth(lineWidth); // set line thickness      
+	    targetPaint.setStrokeWidth(lineWidth); // set line thickness       
+	    backgroundPaint.setColor(Color.WHITE); // set background color
+
+	    newGame(); // set up and start a new game
+		} // end method onSizeChanged
 }
