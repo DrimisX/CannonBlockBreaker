@@ -127,5 +127,8 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 		backgroundPaint = new Paint();
 		
 	}// end CannonView constructor
+	
+	// called by surfaceChanged when the size of the SurfaceView changes,
+	// such as when it's first added to the View hierarchy
 
 }
