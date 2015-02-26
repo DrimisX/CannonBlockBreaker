@@ -176,116 +176,107 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 		} // end method onSizeChanged
 	
 	// reset all the screen elements and start a new game
-		public void newGame() {
-			// set every element of hitStates to false--restores target pieces
-			for (int i = 0; i < TARGET_PIECES; i++)
-				hitStates[i] = false;
-
+	public void newGame() {
+		// set every element of hitStates to false--restores target pieces
+		for (int i = 0; i < TARGET_PIECES; i++)
+			hitStates[i] = false;
 			targetPiecesHit = 0; // no target pieces have been hit
-			blockerVelocity = initialBlockerVelocity; // set initial velocity
-			targetVelocity = initialTargetVelocity; // set initial velocity
-			timeLeft = 10; // start the countdown at 10 seconds
-			cannonballOnScreen = false; // the cannonball is not on the screen
-			shotsFired = 0; // set the initial number of shots fired
-			totalElapsedTime = 0.0; // set the time elapsed to zero
-	      
-			// set the start and end Points of the blocker and target
-			blocker.start.set(blockerDistance, blockerBeginning);
-			blocker.end.set(blockerDistance, blockerEnd);
-			target.start.set(targetDistance, targetBeginning);
-			target.end.set(targetDistance, targetEnd);
-	      
-			if (gameOver) {// starting a new game after the last game ended
-				gameOver = false; 
-				cannonThread = new CannonThread(getHolder()); // create thread
-				cannonThread.start(); // start the game loop thread
-			} 
-		} // end method newGame
-
+		blockerVelocity = initialBlockerVelocity; // set initial velocity
+		targetVelocity = initialTargetVelocity; // set initial velocity
+		timeLeft = 10; // start the countdown at 10 seconds
+		cannonballOnScreen = false; // the cannonball is not on the screen
+		shotsFired = 0; // set the initial number of shots fired
+		totalElapsedTime = 0.0; // set the time elapsed to zero
+      
+		// set the start and end Points of the blocker and target
+		blocker.start.set(blockerDistance, blockerBeginning);
+		blocker.end.set(blockerDistance, blockerEnd);
+		target.start.set(targetDistance, targetBeginning);
+		target.end.set(targetDistance, targetEnd);
+      
+		if (gameOver) {// starting a new game after the last game ended
+			gameOver = false; 
+			cannonThread = new CannonThread(getHolder()); // create thread
+			cannonThread.start(); // start the game loop thread
+		} 
+	} // end method newGame
 		// called repeatedly by the CannonThread to update game elements
-		private void updatePositions(double elapsedTimeMS) {
-			double interval = elapsedTimeMS / 1000.0; // convert to seconds
-
+	private void updatePositions(double elapsedTimeMS) {
+		double interval = elapsedTimeMS / 1000.0; // convert to seconds
 			if (cannonballOnScreen) { // if there is currently a shot fired
-	        // update cannonball position
-				cannonball.x += interval * cannonballVelocityX;
-				cannonball.y += interval * cannonballVelocityY;
-
+        // update cannonball position
+			cannonball.x += interval * cannonballVelocityX;
+			cannonball.y += interval * cannonballVelocityY;
 				// check for collision with blocker
-				if (cannonball.x + cannonballRadius > blockerDistance && 
-				  cannonball.x - cannonballRadius < blockerDistance &&
-				  cannonball.y + cannonballRadius > blocker.start.y &&
-				  cannonball.y - cannonballRadius < blocker.end.y) {
-					cannonballVelocityX *= -1; // reverse cannonball's direction
-					timeLeft -= MISS_PENALTY; // penalize the user
-
+			if (cannonball.x + cannonballRadius > blockerDistance && 
+			  cannonball.x - cannonballRadius < blockerDistance &&
+			  cannonball.y + cannonballRadius > blocker.start.y &&
+			  cannonball.y - cannonballRadius < blocker.end.y) {
+				cannonballVelocityX *= -1; // reverse cannonball's direction
+				timeLeft -= MISS_PENALTY; // penalize the user
 					// play blocker sound
-					soundPool.play(soundMap.get(BLOCKER_SOUND_ID), 1, 1, 1, 0, 1f);
-				}
-				// check for collisions with left and right walls
-				else if (cannonball.x + cannonballRadius > screenWidth || 
-				  cannonball.x - cannonballRadius < 0) {
-					cannonballOnScreen = false; // remove cannonball from screen
-				}
-				// check for collisions with top and bottom walls
-				else if (cannonball.y + cannonballRadius > screenHeight || 
-	              cannonball.y - cannonballRadius < 0) {
-					cannonballOnScreen = false; // remove cannonball from screen
-				}
-				// check for cannonball collision with target
-				else if (cannonball.x + cannonballRadius > targetDistance && 
-	              cannonball.x - cannonballRadius < targetDistance && 
-	              cannonball.y + cannonballRadius > target.start.y &&
-	              cannonball.y - cannonballRadius < target.end.y) {
-					// determine target section number (0 is the top)
-					int section = (int) ((cannonball.y - target.start.y) / pieceLength);
-	            
-					// check if the piece hasn't been hit yet
-					if ((section >= 0 && section < TARGET_PIECES) && 
-					  !hitStates[section]) {
-						hitStates[section] = true; // section was hit
-						cannonballOnScreen = false; // remove cannonball
-						timeLeft += HIT_REWARD; // add reward to remaining time
-
+				soundPool.play(soundMap.get(BLOCKER_SOUND_ID), 1, 1, 1, 0, 1f);
+			}
+			// check for collisions with left and right walls
+			else if (cannonball.x + cannonballRadius > screenWidth || 
+			  cannonball.x - cannonballRadius < 0) {
+				cannonballOnScreen = false; // remove cannonball from screen
+			}
+			// check for collisions with top and bottom walls
+			else if (cannonball.y + cannonballRadius > screenHeight || 
+              cannonball.y - cannonballRadius < 0) {
+				cannonballOnScreen = false; // remove cannonball from screen
+			}
+			// check for cannonball collision with target
+			else if (cannonball.x + cannonballRadius > targetDistance && 
+              cannonball.x - cannonballRadius < targetDistance && 
+              cannonball.y + cannonballRadius > target.start.y &&
+              cannonball.y - cannonballRadius < target.end.y) {
+				// determine target section number (0 is the top)
+				int section = (int) ((cannonball.y - target.start.y) / pieceLength);
+            
+				// check if the piece hasn't been hit yet
+				if ((section >= 0 && section < TARGET_PIECES) && 
+				  !hitStates[section]) {
+					hitStates[section] = true; // section was hit
+					cannonballOnScreen = false; // remove cannonball
+					timeLeft += HIT_REWARD; // add reward to remaining time
 						// play target hit sound
-						soundPool.play(soundMap.get(TARGET_SOUND_ID), 1, 1, 1, 0, 1f);
-
+					soundPool.play(soundMap.get(TARGET_SOUND_ID), 1, 1, 1, 0, 1f);
 						// if all pieces have been hit
-						if (++targetPiecesHit == TARGET_PIECES) {
-							cannonThread.setRunning(false); // terminate thread
-							showGameOverDialog(R.string.win); // show winning dialog
-							gameOver = true; 
-						} 
-					}
+					if (++targetPiecesHit == TARGET_PIECES) {
+						cannonThread.setRunning(false); // terminate thread
+						showGameOverDialog(R.string.win); // show winning dialog
+						gameOver = true; 
+					} 
 				}
 			}
+		}
 
-			// update the blocker's position
-			double blockerUpdate = interval * blockerVelocity;
-			blocker.start.y += blockerUpdate;
-			blocker.end.y += blockerUpdate;
+		// update the blocker's position
+		double blockerUpdate = interval * blockerVelocity;
+		blocker.start.y += blockerUpdate;
+		blocker.end.y += blockerUpdate;
 
-			// update the target's position
-			double targetUpdate = interval * targetVelocity;
-			target.start.y += targetUpdate;
-			target.end.y += targetUpdate;
+		// update the target's position
+		double targetUpdate = interval * targetVelocity;
+		target.start.y += targetUpdate;
+		target.end.y += targetUpdate;
 
-			// if the blocker hit the top or bottom, reverse direction
-			if (blocker.start.y < 0 || blocker.end.y > screenHeight)
-				blockerVelocity *= -1;
-
+		// if the blocker hit the top or bottom, reverse direction
+		if (blocker.start.y < 0 || blocker.end.y > screenHeight)
+			blockerVelocity *= -1;
 			// if the target hit the top or bottom, reverse direction
-			if (target.start.y < 0 || target.end.y > screenHeight)
-				targetVelocity *= -1;
-
+		if (target.start.y < 0 || target.end.y > screenHeight)
+		  targetVelocity *= -1;
 			timeLeft -= interval; // subtract from time left
-
 			// if the timer reached zero
-			if (timeLeft <= 0.0) {
-				timeLeft = 0.0;
-				gameOver = true; // the game is over
-				cannonThread.setRunning(false); // terminate thread
-				showGameOverDialog(R.string.lose); // show the losing dialog
-			} 
-		} // end method updatePositions
+		if (timeLeft <= 0.0) {
+			timeLeft = 0.0;
+			gameOver = true; // the game is over
+			cannonThread.setRunning(false); // terminate thread
+			showGameOverDialog(R.string.lose); // show the losing dialog
+		} 
+	} // end method updatePositions
+
 }
