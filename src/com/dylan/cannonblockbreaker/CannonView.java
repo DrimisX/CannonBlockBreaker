@@ -29,9 +29,12 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 	private boolean dialogIsDisplayed = false;
 	
 	//constants for game play
-	public static final int TARGET_PIECES = 7; // sections in the target
 	public static final int MISS_PENALTY =2; // seconds deducted on a miss
 	public static final int HIT_REWARD = 3; // seconds added on a hit
+	
+	//ALTERED VARIABLES FOR ENHANCEMENT
+	public int target_pieces = 1; 	// sections in the target - Starts at 1 for level 1
+	public int level_num = 1; 		// level number - Starts at 1 for level 1
 	
 	//variables for the game loop and tracking statistics
 	private boolean gameOver; // is the game over?
@@ -107,7 +110,7 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 		cannonball = new Point(); // create the cannonball as a Point
 		
 		// initialize hitStates as a boolean array
-		hitStates = new boolean[TARGET_PIECES];
+		hitStates = new boolean[target_pieces];
 		
 		// initialize SoundPool to play the app's three sound effects
 		soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
@@ -157,7 +160,7 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 	    targetDistance = w * 7 / 8; // target 7/8 screen width from left
 	    targetBeginning = h / 8; // distance from top 1/8 screen height
 	    targetEnd = h * 7 / 8; // distance from top 7/8 screen height
-	    pieceLength = (targetEnd - targetBeginning) / TARGET_PIECES;
+	    pieceLength = (targetEnd - targetBeginning) / target_pieces;
 	    initialTargetVelocity = -h / 4; // initial target speed multiplier
 	    target.start = new Point(targetDistance, targetBeginning);
 	    target.end = new Point(targetDistance, targetEnd);
@@ -178,8 +181,9 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	// reset all the screen elements and start a new game
 	public void newGame() {
+		target_pieces = level_num; // Set the number of target pieces to the current level
 		// set every element of hitStates to false--restores target pieces
-		for (int i = 0; i < TARGET_PIECES; i++)
+		for (int i = 0; i < target_pieces; i++)
 			hitStates[i] = false;
 			targetPiecesHit = 0; // no target pieces have been hit
 		blockerVelocity = initialBlockerVelocity; // set initial velocity
@@ -237,7 +241,7 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 				int section = (int) ((cannonball.y - target.start.y) / pieceLength);
             
 				// check if the piece hasn't been hit yet
-				if ((section >= 0 && section < TARGET_PIECES) && 
+				if ((section >= 0 && section < target_pieces) && 
 				  !hitStates[section]) {
 					hitStates[section] = true; // section was hit
 					cannonballOnScreen = false; // remove cannonball
@@ -245,10 +249,18 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 						// play target hit sound
 					soundPool.play(soundMap.get(TARGET_SOUND_ID), 1, 1, 1, 0, 1f);
 						// if all pieces have been hit
-					if (++targetPiecesHit == TARGET_PIECES) {
+					if (++targetPiecesHit == target_pieces) {
 						cannonThread.setRunning(false); // terminate thread
-						showGameOverDialog(R.string.win); // show winning dialog
-						gameOver = true; 
+						if (level_num == 9) { // if player beat final level, show appropriate dialog
+							showGameOverDialog(R.string.winFinal);
+							level_num = 1; // reset level number to 1
+						} else {
+							showGameOverDialog(R.string.win); // otherwise, show standard winning dialog
+							level_num += 1; // increase the level by 1
+						}
+						gameOver = true;
+						
+						
 					} 
 				}
 			}
@@ -277,6 +289,7 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 			gameOver = true; // the game is over
 			cannonThread.setRunning(false); // terminate thread
 			showGameOverDialog(R.string.lose); // show the losing dialog
+			level_num = 1;	// reset the level to 1
 		} 
 	} // end method updatePositions
 	
@@ -357,7 +370,7 @@ public class CannonView extends SurfaceView implements SurfaceHolder.Callback {
 		currentPoint.y = target.start.y;
 
 		// draw the target
-		for (int i = 0; i < TARGET_PIECES; i++) {
+		for (int i = 0; i < target_pieces; i++) {
          // if this target piece is not hit, draw it
 			if (!hitStates[i]) {
 				// alternate coloring the pieces 

@@ -6,8 +6,9 @@
     <string name="action_settings">Settings</string>
 	<string name="results_format">Shots fired: %1$d\nTotal time: %2$.1f</string>
 	<string name="reset_game">Reset Game</string>
-	<string name="win">You win!</string>
+	<string name="win">You win! Click to start next level!</string>
 	<string name="lose">You get nothing! You lose! Good day, sir!</string>
 	<string name="time_remaining_format">Time remaining: %.1f seconds</string>
+	<string name="winFinal">Charlie, my boy, you did it! You\'ve won! You get everything!</string>
 	
 </resources>
